@@ -1,0 +1,142 @@
+[
+  {
+    "escenario": "Base_3Asesores",
+    "configuracion": {
+      "num_asesores": 3,
+      "num_cajeros": 1,
+      "num_personal_entrega": 1,
+      "duracion": 480.0,
+      "tasa_llegada": 0.2,
+      "prob_credito": 0.4
+    },
+    "metricas": {
+      "total_clientes": 78,
+      "ventas_exitosas": 59,
+      "abandonos": 18,
+      "tasa_conversion": 75.64102564102564,
+      "tiempo_promedio_sistema_min": 28.45608958258931,
+      "tiempo_espera_asesor_prom": 0.5165827085792801,
+      "tiempo_espera_credito_prom": 17.33858105721534,
+      "tiempo_espera_caja_prom": 1.6870360249474445,
+      "tiempo_espera_entrega_prom": 1.5973315380755868,
+      "utilizacion_asesores": 0.47459986082115513,
+      "utilizacion_cajeros": 0.5448851774530271,
+      "utilizacion_entrega": 0.6889352818371608,
+      "cola_media_asesor": 0.08559498956158663,
+      "cola_media_caja": 0.21294363256784968,
+      "cola_media_entrega": 0.20876826722338204
+    }
+  },
+  {
+    "escenario": "Base_3Asesores",
+    "configuracion": {
+      "num_asesores": 3,
+      "num_cajeros": 1,
+      "num_personal_entrega": 1,
+      "duracion": 480.0,
+      "tasa_llegada": 0.2,
+      "prob_credito": 0.4
+    },
+    "metricas": {
+      "total_clientes": 78,
+      "ventas_exitosas": 59,
+      "abandonos": 18,
+      "tasa_conversion": 75.64102564102564,
+      "tiempo_promedio_sistema_min": 28.45608958258931,
+      "tiempo_espera_asesor_prom": 0.5165827085792801,
+      "tiempo_espera_credito_prom": 17.33858105721534,
+      "tiempo_espera_caja_prom": 1.6870360249474445,
+      "tiempo_espera_entrega_prom": 1.5973315380755868,
+      "utilizacion_asesores": 0.47459986082115513,
+      "utilizacion_cajeros": 0.5448851774530271,
+      "utilizacion_entrega": 0.6889352818371608,
+      "cola_media_asesor": 0.08559498956158663,
+      "cola_media_caja": 0.21294363256784968,
+      "cola_media_entrega": 0.20876826722338204
+    }
+  },
+  {
+    "escenario": "Base_3Asesores",
+    "configuracion": {
+      "num_asesores": 3,
+      "num_cajeros": 1,
+      "num_personal_entrega": 1,
+      "duracion": 480.0,
+      "tasa_llegada": 0.2,
+      "prob_credito": 0.4
+    },
+    "metricas": {
+      "total_clientes": 0.0,
+      "ventas_exitosas": 59.0,
+      "abandonos": 18.0,
+      "tasa_conversion": 5900.0,
+      "tiempo_promedio_sistema_min": 28.45608958258931,
+      "tiempo_espera_asesor_prom": 0.5165827085792801,
+      "tiempo_espera_credito_prom": 17.33858105721534,
+      "tiempo_espera_caja_prom": 1.6870360249474445,
+      "tiempo_espera_entrega_prom": 1.5973315380755868,
+      "utilizacion_asesores": 0.47459986082115513,
+      "utilizacion_cajeros": 0.5448851774530271,
+      "utilizacion_entrega": 0.6889352818371608,
+      "cola_media_asesor": 0.08559498956158663,
+      "cola_media_caja": 0.21294363256784968,
+      "cola_media_entrega": 0.20876826722338204
+    }
+  },
+  {
+    "escenario": "Base_3Asesores",
+    "configuracion": {
+      "num_asesores": 3,
+      "num_cajeros": 1,
+      "num_personal_entrega": 1,
+      "duracion": 480.0,
+      "tasa_llegada": 0.2,
+      "prob_credito": 0.4
+    },
+    "metricas": {
+      "total_clientes": 0.0,
+      "ventas_exitosas": 59.0,
+      "abandonos": 18.0,
+      "tasa_conversion": 5900.0,
+      "tiempo_promedio_sistema_min": 28.45608958258931,
+      "tiempo_espera_asesor_prom": 0.5165827085792801,
+      "tiempo_espera_credito_prom": 17.33858105721534,
+      "tiempo_espera_caja_prom": 1.6870360249474445,
+      "tiempo_espera_entrega_prom": 1.5973315380755868,
+      "utilizacion_asesores": 0.47459986082115513,
+      "utilizacion_cajeros": 0.5448851774530271,
+      "utilizacion_entrega": 0.6889352818371608,
+      "cola_media_asesor": 0.08559498956158663,
+      "cola_media_caja": 0.21294363256784968,
+      "cola_media_entrega": 0.20876826722338204
+    }
+  },
+  {
+    "escenario": "Base_3Asesores",
+    "configuracion": {
+      "num_asesores": 3,
+      "num_cajeros": 1,
+      "num_personal_entrega": 1,
+      "duracion": 480.0,
+      "tasa_llegada": 0.2,
+      "prob_credito": 0.4
+    },
+    "metricas": {
+      "total_clientes": 0.0,
+      "ventas_exitosas": 59.0,
+      "abandonos": 18.0,
+      "tasa_conversion": 5900.0,
+      "tiempo_promedio_sistema_min": 28.45608958258931,
+      "tiempo_espera_asesor_prom": 0.5165827085792801,
+      "tiempo_espera_credito_prom": 17.33858105721534,
+      "tiempo_espera_caja_prom": 1.6870360249474445,
+      "tiempo_espera_entrega_prom": 1.5973315380755868,
+      "utilizacion_asesores": 0.47459986082115513,
+      "utilizacion_cajeros": 0.5448851774530271,
+      "utilizacion_entrega": 0.6889352818371608,
+      "cola_media_asesor": 0.08559498956158663,
+      "cola_media_caja": 0.21294363256784968,
+      "cola_media_entrega": 0.20876826722338204
+    }
+  }
+]
