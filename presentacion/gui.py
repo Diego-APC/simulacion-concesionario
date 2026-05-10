@@ -34,24 +34,33 @@ class SimulacionGUI:
         self.num_asesores = tk.IntVar(value=3)
         ttk.Spinbox(frame_control, from_=1, to=10, textvariable=self.num_asesores, width=5).grid(row=0, column=1, pady=5)
         
-        ttk.Label(frame_control, text="Tasa llegada (clientes/min):").grid(row=1, column=0, sticky=tk.W, pady=5)
+        ttk.Label(frame_control, text="Número de cajeros:").grid(row=1, column=0, sticky=tk.W, pady=5)
+        self.num_cajeros = tk.IntVar(value=1)
+        ttk.Spinbox(frame_control, from_=1, to=5, textvariable=self.num_cajeros, width=5).grid(row=1, column=1, pady=5)
+
+        ttk.Label(frame_control, text="Personal de entrega:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        self.num_entrega = tk.IntVar(value=1)
+        ttk.Spinbox(frame_control, from_=1, to=5, textvariable=self.num_entrega, width=5).grid(row=2, column=1, pady=5)
+
+        
+        ttk.Label(frame_control, text="Tasa llegada (clientes/min):").grid(row=3, column=0, sticky=tk.W, pady=5)
         self.tasa_llegada = tk.DoubleVar(value=0.2)
-        ttk.Entry(frame_control, textvariable=self.tasa_llegada, width=10).grid(row=1, column=1, pady=5)
+        ttk.Entry(frame_control, textvariable=self.tasa_llegada, width=10).grid(row=3, column=1, pady=5)
         
-        ttk.Label(frame_control, text="Prob. necesidad crédito:").grid(row=2, column=0, sticky=tk.W, pady=5)
+        ttk.Label(frame_control, text="Prob. necesidad crédito:").grid(row=4, column=0, sticky=tk.W, pady=5)
         self.prob_credito = tk.DoubleVar(value=0.4)
-        ttk.Scale(frame_control, from_=0, to=1, variable=self.prob_credito, orient=tk.HORIZONTAL, length=100).grid(row=2, column=1, pady=5)
-        ttk.Label(frame_control, textvariable=self.prob_credito).grid(row=2, column=2)
+        ttk.Scale(frame_control, from_=0, to=1, variable=self.prob_credito, orient=tk.HORIZONTAL, length=100).grid(row=4, column=1, pady=5)
+        ttk.Label(frame_control, textvariable=self.prob_credito).grid(row=4, column=2)
         
-        ttk.Label(frame_control, text="Número de réplicas:").grid(row=3, column=0, sticky=tk.W, pady=5)
+        ttk.Label(frame_control, text="Número de réplicas:").grid(row=5, column=0, sticky=tk.W, pady=5)
         self.replicas = tk.IntVar(value=1)
-        ttk.Spinbox(frame_control, from_=1, to=20, textvariable=self.replicas, width=5).grid(row=3, column=1, pady=5)
+        ttk.Spinbox(frame_control, from_=1, to=20, textvariable=self.replicas, width=5).grid(row=5, column=1, pady=5)
         
         btn_simular = ttk.Button(frame_control, text="Iniciar Simulación", command=self.iniciar_simulacion)
-        btn_simular.grid(row=4, column=0, columnspan=2, pady=20)
+        btn_simular.grid(row=6, column=0, columnspan=2, pady=20)
         
         btn_validar = ttk.Button(frame_control, text="Validar distribuciones", command=self.validar_distribuciones)
-        btn_validar.grid(row=5, column=0, columnspan=2, pady=5)
+        btn_validar.grid(row=7, column=0, columnspan=2, pady=5)
         
         # Frame derecho: pestañas para resultados y gráficos
         notebook = ttk.Notebook(self.root)
@@ -82,6 +91,8 @@ class SimulacionGUI:
         self.config.num_asesores = self.num_asesores.get()
         self.config.tasa_llegada_por_min = self.tasa_llegada.get()
         self.config.prob_credito = self.prob_credito.get()
+        self.config.num_cajeros = self.num_cajeros.get()
+        self.config.num_personal_entrega = self.num_entrega.get()
         self.config.semilla = 42  # fija para reproducibilidad
         replicas = self.replicas.get()
         
@@ -139,13 +150,19 @@ class SimulacionGUI:
         # Gráfico de utilización
         recursos = ['Asesores', 'Cajeros', 'Entrega']
         uso = [
-            self.resultados['utilizacion_asesores'],
-            self.resultados['utilizacion_cajeros'],
-            self.resultados['utilizacion_entrega']
+            self.resultados['utilizacion_asesores']* 100,
+            self.resultados['utilizacion_cajeros']* 100,
+            self.resultados['utilizacion_entrega']* 100
         ]
-        axes[0,1].bar(recursos, uso, color='lightgreen')
+        bars = axes[0,1].bar(recursos, uso, color='lightgreen')
         axes[0,1].set_title('Utilización de recursos')
-        axes[0,1].set_ylabel('Proporción')
+        axes[0,1].set_ylabel('Porcentaje (%)')
+        axes[0,1].set_ylim(0, 100)
+
+        # Etiquetas de datos
+        for bar, val in zip(bars, uso):
+            axes[0,1].text(bar.get_x() + bar.get_width()/2, bar.get_height() + 1,
+                   f'{val:.1f}%', ha='center', va='bottom', fontsize=9)
         
         # Evolución de cola (simulada, aquí solo mostramos promedio)
         colas = ['Asesores', 'Caja', 'Entrega']

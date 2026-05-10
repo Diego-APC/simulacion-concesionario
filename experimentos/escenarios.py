@@ -23,5 +23,17 @@ def obtener_escenarios_base():
     # Escenario 5: Menor probabilidad de crédito
     config5 = ConfiguracionSimulacion(prob_credito=0.2)
     escenarios.append((config5, "BajoCredito_3Asesores"))
+
+    # Escenario 6: 2 cajeros
+    config6 = ConfiguracionSimulacion(num_cajeros=2)
+    escenarios.append((config6, "2_Cajeros"))
+
+    # Escenario 7: 2 personal entrega
+    config7 = ConfiguracionSimulacion(num_personal_entrega=2)
+    escenarios.append((config7, "2_PersonalEntrega"))
+
+    # Escenario 8: 2 cajeros y 2 personal entrega
+    config8 = ConfiguracionSimulacion(num_cajeros=2, num_personal_entrega=2)
+    escenarios.append((config8, "2Cajeros_2Entrega"))
     
     return escenarios

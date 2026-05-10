@@ -43,7 +43,7 @@ class Cliente:
 class ConfiguracionSimulacion:
     num_asesores: int = 3
     num_cajeros: int = 1
-    num_personal_entrega: int = 1
+    num_personal_entrega: int = 1      
     duracion_jornada_min: float = 480.0  # 8 horas
     tasa_llegada_por_min: float = 0.2    # exponencial con media 5 min
     tiempo_asesor_min: float = 4.0
@@ -82,3 +82,5 @@ class ConfiguracionSimulacion:
         assert self.num_personal_entrega > 0
         assert self.tasa_llegada_por_min > 0
         np.random.seed(self.semilla)
+
+        

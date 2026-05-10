@@ -11,6 +11,8 @@ def ejecutar_cli():
     parser.add_argument("--escenario", type=str, default="Base_3Asesores", help="Nombre del escenario a ejecutar")
     parser.add_argument("--todos", action="store_true", help="Ejecutar todos los escenarios predefinidos")
     parser.add_argument("--ver", action="store_true", help="Mostrar resultados históricos")
+    parser.add_argument("--cajeros", type=int, default=None, help="Número de cajeros (sobrescribe escenario)")
+    parser.add_argument("--entrega", type=int, default=None, help="Número de personal de entrega")
     args = parser.parse_args()
     
     motor = SimuladorSimPy()
@@ -55,6 +57,10 @@ def ejecutar_cli():
         if config is None:
             # Permitir configuración personalizada vía parámetros adicionales (simplificado)
             config = ConfiguracionSimulacion()
+            if args.cajeros is not None:
+                config.num_cajeros = args.cajeros
+            if args.entrega is not None:
+                config.num_personal_entrega = args.entrega
         metricas = orquestador.ejecutar_escenario(config, args.escenario)
         print("\nResultados de la simulación:")
         for k, v in metricas.items():
