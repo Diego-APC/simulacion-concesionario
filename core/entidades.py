@@ -3,10 +3,6 @@ from enum import Enum
 from typing import Optional, Dict, Any
 import numpy as np
 
-class InteresCliente(Enum):
-    BAJO = "bajo"
-    MEDIO = "medio"
-    ALTO = "alto"
 
 class EstadoCliente(Enum):
     ESPERA_ASESOR = "es_asesor"
@@ -24,8 +20,7 @@ class EstadoCliente(Enum):
 class Cliente:
     id: int
     tiempo_llegada: float
-    necesita_credito: bool
-    interes: InteresCliente
+    necesita_credito: Optional[bool] = None
     estado: EstadoCliente = EstadoCliente.ESPERA_ASESOR
     tiempo_inicio_asesor: Optional[float] = None
     tiempo_fin_asesor: Optional[float] = None
@@ -58,29 +53,32 @@ class ConfiguracionSimulacion:
     tiempo_entrega_max: float = 8.0
     prob_credito: float = 0.4
     prob_aprobacion_credito: float = 0.75
-    prob_interes_bajo: float = 0.3
-    prob_interes_medio: float = 0.5
-    prob_interes_alto: float = 0.2
-    # Probabilidad de compra después de asesoría (sin crédito) según interés
-    prob_compra_sin_credito: Dict[InteresCliente, float] = field(default_factory=lambda: {
-        InteresCliente.BAJO: 0.50,
-        InteresCliente.MEDIO: 0.80,
-        InteresCliente.ALTO: 0.95,
-    })
+    prob_compra_sin_credito: float = 0.10   # 10% compra directa
+    prob_compra_con_credito: float = 0.15   # 15% compra con crédito
+    prob_abandono_despues_asesoria: float = 0.75  # 75% abandona
+    
     # Semilla aleatoria (para reproducibilidad)
     semilla: int = 42
     # Verificación: mostrar logs detallados?
     verbose: bool = False
 
-    def __post_init__(self):
-        # Validaciones
-        assert 0 <= self.prob_credito <= 1
-        assert 0 <= self.prob_aprobacion_credito <= 1
-        assert abs(self.prob_interes_bajo + self.prob_interes_medio + self.prob_interes_alto - 1.0) < 1e-6
-        assert self.num_asesores > 0
-        assert self.num_cajeros > 0
-        assert self.num_personal_entrega > 0
-        assert self.tasa_llegada_por_min > 0
-        np.random.seed(self.semilla)
+def __post_init__(self):
+    # Validaciones de probabilidades de compra/abandono
+    assert 0 <= self.prob_compra_sin_credito <= 1
+    assert 0 <= self.prob_compra_con_credito <= 1
+    assert 0 <= self.prob_abandono_despues_asesoria <= 1
+    total = self.prob_compra_sin_credito + self.prob_compra_con_credito + self.prob_abandono_despues_asesoria
+    assert abs(total - 1.0) < 1e-6, f"Las probabilidades deben sumar 1 (suman {total})"
+    
+    # Validación de aprobación de crédito
+    assert 0 <= self.prob_aprobacion_credito <= 1
+    
+    # Validaciones de recursos
+    assert self.num_asesores > 0
+    assert self.num_cajeros > 0
+    assert self.num_personal_entrega > 0
+    assert self.tasa_llegada_por_min > 0
+    
+    np.random.seed(self.semilla)
 
         

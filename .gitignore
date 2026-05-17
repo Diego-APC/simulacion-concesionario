@@ -1,0 +1,60 @@
+# Bytecode y caché de Python
+__pycache__/
+*.py[cod]
+*.so
+*.pyd
+
+# Entornos virtuales
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+.venv/
+
+# Archivos de distribución y empaquetado
+*.egg-info/
+*.egg
+dist/
+build/
+
+# Archivos de logs y bases de datos
+*.log
+*.db
+*.sqlite
+*.sqlite3
+
+# Resultados de simulación (puedes ajustar si quieres versionar algunos)
+resultados_simulation.json
+*.json
+
+# Archivos de configuración de editores
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# Archivos de pruebas y cobertura
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Archivos de entorno
+.env
+.venv
+.env.local
+
+# Archivos de proyecto específicos (si generas gráficos o reportes)
+*.png
+*.jpg
+*.pdf
+*.docx
+!requirements.txt  # Asegura que requirements.txt no se ignore
+
+# Archivos de respaldo
+*.bak
+*.orig

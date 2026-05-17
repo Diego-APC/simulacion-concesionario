@@ -1,7 +1,7 @@
 import simpy
 import numpy as np
 from typing import Dict, Any, Optional, List, Tuple
-from core.entidades import Cliente, ConfiguracionSimulacion, EstadoCliente, InteresCliente
+from core.entidades import Cliente, ConfiguracionSimulacion, EstadoCliente
 from core.interfaces import MotorSimulacion
 
 class SimuladorSimPy(MotorSimulacion):
@@ -74,16 +74,11 @@ class SimuladorSimPy(MotorSimulacion):
                             tiempos_entre_llegadas.append(ahora - ultima_llegada)
                         ultima_llegada = ahora
                     cliente_id += 1
-                    necesita_credito = np.random.random() < config.prob_credito
-                    r_interes = np.random.random()
-                    if r_interes < config.prob_interes_bajo:
-                        interes = InteresCliente.BAJO
-                    elif r_interes < config.prob_interes_bajo + config.prob_interes_medio:
-                        interes = InteresCliente.MEDIO
-                    else:
-                        interes = InteresCliente.ALTO
-                    cliente = Cliente(id=cliente_id, tiempo_llegada=env.now, necesita_credito=necesita_credito, interes=interes)
-                    env.process(proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, stats, tiempos_atencion_asesor if r==0 else None))
+                    stats["clientes_atendidos"] += 1   # LÍNEA NUEVA: contabiliza cliente que llega
+                    
+                    # Crear cliente sin necesidad de crédito ni interés (se decidirá después de asesoría)
+                    cliente = Cliente(id=cliente_id, tiempo_llegada=env.now)
+                    env.process(proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, stats, tiempos_atencion_asesor if r == 0 else None))
             
             env.process(llegada_cliente())
             env.run(until=config.duracion_jornada_min)
@@ -126,14 +121,13 @@ class SimuladorSimPy(MotorSimulacion):
     
 # Proceso individual del cliente
 def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, stats, lista_tiempos_asesor=None):
-    # 1. Espera y atención asesor
+    # 1. Atención asesor (igual)
     llegada_asesor = env.now
     with asesores.request() as req:
         yield req
         tiempo_espera_asesor = env.now - llegada_asesor
         stats["tiempos_espera_asesor"].append(tiempo_espera_asesor)
         cliente.tiempo_inicio_asesor = env.now
-        # Tiempo de atención asesor (triangular)
         duracion = np.random.triangular(
             config.tiempo_asesor_min,
             config.tiempo_asesor_moda,
@@ -143,19 +137,27 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
             lista_tiempos_asesor.append(duracion)
         yield env.timeout(duracion)
         cliente.tiempo_fin_asesor = env.now
-    
-    # 2. Decisión post asesoría
-    if not cliente.necesita_credito:
-        # Decisión de compra según interés
-        prob = config.prob_compra_sin_credito[cliente.interes]
-        compra = np.random.random() < prob
-        if not compra:
-            cliente.estado = EstadoCliente.ABANDONO
-            cliente.tiempo_abandono = env.now
-            stats["abandonos"] += 1
-            return
-    else:
-        # 3. Proceso de crédito (sin recurso, solo retardo)
+
+    # 2. Decisión post asesoría (nueva regla)
+    r = np.random.random()
+    if r < config.prob_compra_sin_credito:           # 10% -> compra sin crédito
+        necesita_credito = False
+        compra_decidida = True
+    elif r < config.prob_compra_sin_credito + config.prob_compra_con_credito:  # 15% -> compra con crédito
+        necesita_credito = True
+        compra_decidida = True
+    else:                                            # 75% -> abandono
+        compra_decidida = False
+
+    if not compra_decidida:
+        cliente.estado = EstadoCliente.ABANDONO
+        cliente.tiempo_abandono = env.now
+        stats["abandonos"] += 1
+        return
+
+    # Si compra, entonces:
+    if necesita_credito:
+        # 3. Proceso de crédito
         llegada_credito = env.now
         cliente.tiempo_inicio_credito = env.now
         duracion_credito = np.random.uniform(config.tiempo_credito_min, config.tiempo_credito_max)
@@ -170,8 +172,9 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
             cliente.tiempo_abandono = env.now
             stats["abandonos"] += 1
             return
-    
-    # 4. Pago en caja
+        # Si aprobado, continúa a caja
+
+    # 4. Pago en caja (igual)
     llegada_caja = env.now
     with cajeros.request() as req:
         yield req
@@ -181,8 +184,8 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
         duracion_caja = np.random.uniform(config.tiempo_caja_min, config.tiempo_caja_max)
         yield env.timeout(duracion_caja)
         cliente.tiempo_fin_caja = env.now
-    
-    # 5. Entrega
+
+    # 5. Entrega (igual)
     llegada_entrega = env.now
     with personal_entrega.request() as req:
         yield req
@@ -196,7 +199,7 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
         )
         yield env.timeout(duracion_entrega)
         cliente.tiempo_fin_entrega = env.now
-    
+
     cliente.estado = EstadoCliente.VENTA_EXITOSA
     tiempo_total = env.now - cliente.tiempo_llegada
     stats["tiempos_sistema"].append(tiempo_total)

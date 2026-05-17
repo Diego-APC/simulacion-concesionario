@@ -20,20 +20,16 @@ def obtener_escenarios_base():
     config4 = ConfiguracionSimulacion(tasa_llegada_por_min=0.3)  # media 3.33 min
     escenarios.append((config4, "AltaDemanda_3Asesores"))
     
-    # Escenario 5: Menor probabilidad de crédito
-    config5 = ConfiguracionSimulacion(prob_credito=0.2)
-    escenarios.append((config5, "BajoCredito_3Asesores"))
+    # Escenario 5: 2 cajeros
+    config5 = ConfiguracionSimulacion(num_cajeros=2)
+    escenarios.append((config5, "2_Cajeros"))
 
-    # Escenario 6: 2 cajeros
-    config6 = ConfiguracionSimulacion(num_cajeros=2)
-    escenarios.append((config6, "2_Cajeros"))
+    # Escenario 6: 2 personal entrega
+    config6 = ConfiguracionSimulacion(num_personal_entrega=2)
+    escenarios.append((config6, "2_PersonalEntrega"))
 
-    # Escenario 7: 2 personal entrega
-    config7 = ConfiguracionSimulacion(num_personal_entrega=2)
-    escenarios.append((config7, "2_PersonalEntrega"))
-
-    # Escenario 8: 2 cajeros y 2 personal entrega
-    config8 = ConfiguracionSimulacion(num_cajeros=2, num_personal_entrega=2)
-    escenarios.append((config8, "2Cajeros_2Entrega"))
+    # Escenario 7: 2 cajeros y 2 personal entrega
+    config7 = ConfiguracionSimulacion(num_cajeros=2, num_personal_entrega=2)
+    escenarios.append((config7, "2Cajeros_2Entrega"))
     
     return escenarios
