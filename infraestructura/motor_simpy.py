@@ -121,11 +121,19 @@ class SimuladorSimPy(MotorSimulacion):
     
 # Proceso individual del cliente
 def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, stats, lista_tiempos_asesor=None):
-    # 1. Atención asesor (igual)
-    llegada_asesor = env.now
+    # 1. Atención asesor con timeout por espera en cola
+    llegada_cola_asesor = env.now
     with asesores.request() as req:
-        yield req
-        tiempo_espera_asesor = env.now - llegada_asesor
+        # Esperar hasta obtener el asesor o hasta que pase el tiempo máximo
+        resultado = yield req | env.timeout(config.max_espera_asesor_min)
+        if req not in resultado:
+            # Timeout: el cliente abandona por impaciencia
+            cliente.estado = EstadoCliente.ABANDONO
+            cliente.tiempo_abandono = env.now
+            stats["abandonos"] += 1
+            return
+        # Si obtiene el recurso, registrar tiempo de espera real
+        tiempo_espera_asesor = env.now - llegada_cola_asesor
         stats["tiempos_espera_asesor"].append(tiempo_espera_asesor)
         cliente.tiempo_inicio_asesor = env.now
         duracion = np.random.triangular(
@@ -138,7 +146,7 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
         yield env.timeout(duracion)
         cliente.tiempo_fin_asesor = env.now
 
-    # 2. Decisión post asesoría (nueva regla)
+    # 2. Decisión post asesoría (nueva regla: 10%, 15%, 75%)
     r = np.random.random()
     if r < config.prob_compra_sin_credito:           # 10% -> compra sin crédito
         necesita_credito = False
@@ -155,9 +163,8 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
         stats["abandonos"] += 1
         return
 
-    # Si compra, entonces:
+    # 3. Si necesita crédito, proceso de crédito (sin cola)
     if necesita_credito:
-        # 3. Proceso de crédito
         llegada_credito = env.now
         cliente.tiempo_inicio_credito = env.now
         duracion_credito = np.random.uniform(config.tiempo_credito_min, config.tiempo_credito_max)
@@ -172,26 +179,35 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
             cliente.tiempo_abandono = env.now
             stats["abandonos"] += 1
             return
-        # Si aprobado, continúa a caja
 
-    # 4. Pago en caja (igual)
-    llegada_caja = env.now
+    # 4. Pago en caja con timeout
+    llegada_cola_caja = env.now
     with cajeros.request() as req:
-        yield req
-        cliente.tiempo_inicio_caja = env.now
-        tiempo_espera_caja = env.now - llegada_caja
+        resultado = yield req | env.timeout(config.max_espera_caja_min)
+        if req not in resultado:
+            cliente.estado = EstadoCliente.ABANDONO
+            cliente.tiempo_abandono = env.now
+            stats["abandonos"] += 1
+            return
+        tiempo_espera_caja = env.now - llegada_cola_caja
         stats["tiempos_espera_caja"].append(tiempo_espera_caja)
+        cliente.tiempo_inicio_caja = env.now
         duracion_caja = np.random.uniform(config.tiempo_caja_min, config.tiempo_caja_max)
         yield env.timeout(duracion_caja)
         cliente.tiempo_fin_caja = env.now
 
-    # 5. Entrega (igual)
-    llegada_entrega = env.now
+    # 5. Entrega con timeout
+    llegada_cola_entrega = env.now
     with personal_entrega.request() as req:
-        yield req
-        cliente.tiempo_inicio_entrega = env.now
-        tiempo_espera_entrega = env.now - llegada_entrega
+        resultado = yield req | env.timeout(config.max_espera_entrega_min)
+        if req not in resultado:
+            cliente.estado = EstadoCliente.ABANDONO
+            cliente.tiempo_abandono = env.now
+            stats["abandonos"] += 1
+            return
+        tiempo_espera_entrega = env.now - llegada_cola_entrega
         stats["tiempos_espera_entrega"].append(tiempo_espera_entrega)
+        cliente.tiempo_inicio_entrega = env.now
         duracion_entrega = np.random.triangular(
             config.tiempo_entrega_min,
             config.tiempo_entrega_moda,
@@ -200,6 +216,7 @@ def proceso_cliente(env, cliente, asesores, cajeros, personal_entrega, config, s
         yield env.timeout(duracion_entrega)
         cliente.tiempo_fin_entrega = env.now
 
+    # Cliente completó la compra
     cliente.estado = EstadoCliente.VENTA_EXITOSA
     tiempo_total = env.now - cliente.tiempo_llegada
     stats["tiempos_sistema"].append(tiempo_total)

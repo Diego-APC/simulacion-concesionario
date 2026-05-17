@@ -56,6 +56,10 @@ class ConfiguracionSimulacion:
     prob_compra_sin_credito: float = 0.10   # 10% compra directa
     prob_compra_con_credito: float = 0.15   # 15% compra con crédito
     prob_abandono_despues_asesoria: float = 0.75  # 75% abandona
+    # En entidades.py
+    max_espera_asesor_min: float = 10.0
+    max_espera_caja_min: float = 10.0
+    max_espera_entrega_min: float = 30.0
     
     # Semilla aleatoria (para reproducibilidad)
     semilla: int = 42
